@@ -3,7 +3,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  unit_tests:
+  comment_under_branch:
     runs-on: [ ubuntu-latest ]
     permissions:
       contents: write
@@ -46,9 +46,9 @@ jobs:
             const comment = `The extracted task name from the branch is **${taskName}**.`;
 
             await github.rest.issues.createComment({
+              issue_number: context.issue.number,
               owner,
               repo,
-              issue_number: prNumber,
               body: comment
             });
 
