@@ -57,6 +57,3 @@ jobs:
 
       - run: touch local.properties
       - run: echo -e "\n$BUILD_CONFIG_VARIABLES" >> local.properties
-
-#      - name: Unit tests
-#        run: ./gradlew test
