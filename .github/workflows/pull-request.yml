@@ -38,6 +38,7 @@ jobs:
 
         with:
           retries: 3
+          retry-exempt-status-codes: 400,401
           script: |
             const taskName = '${{ steps.extract_task_name.outputs.task_name }}';
             const prNumber = context.payload.pull_request.number;
