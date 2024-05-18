@@ -5,8 +5,7 @@ on:
 jobs:
   comment_under_branch:
     runs-on: [ ubuntu-latest ]
-    permissions:
-      contents: write
+    permissions: write-all
     env:
       BUILD_CONFIG_VARIABLES: ${{ secrets.BUILD_CONFIG_VARIABLES }}
     steps:
