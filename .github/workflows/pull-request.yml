@@ -43,7 +43,7 @@ jobs:
             const prNumber = context.payload.pull_request.number;
             const owner = context.repo.owner;
             const repo = context.repo.repo;
-            const comment = `The extracted task name from the branch is **${taskName}**.`;
+            const comment = `The extracted`;
 
             await github.rest.issues.createComment({
               issue_number: context.issue.number,
