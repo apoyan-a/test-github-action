@@ -45,7 +45,7 @@ jobs:
             const repo = context.repo.repo;
             const comment = `The extracted task name from the branch is **${taskName}**.`;
 
-            github.rest.issues.createComment({
+            await github.rest.issues.createComment({
               issue_number: prNumber,
               owner,
               repo,
