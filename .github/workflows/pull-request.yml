@@ -1,0 +1,62 @@
+on:
+  pull_request:
+    branches: [ "dev" ]
+
+jobs:
+  unit_tests:
+    runs-on: [ ubuntu-latest ]
+    permissions:
+      contents: write
+    env:
+      BUILD_CONFIG_VARIABLES: ${{ secrets.BUILD_CONFIG_VARIABLES }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Get current branch
+        run: |
+          echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+        id: extract_branch
+
+      - name: Log branch name
+        id: ecr
+        run: | 
+          echo ${{ steps.extract_branch.outputs.branch }}
+           if [[ "${{steps.extract_branch.outputs.branch}}" =~ ^([A-Z]+-[0-9]+) ]]; then
+            TASK_NAME="${BASH_REMATCH[1]}"
+            echo "Extracted task name: $TASK_NAME"
+          else
+            echo "No task name found in the branch name."
+            exit 1
+          fi
+          
+          echo "::set-output name=task_name::$TASK_NAME"
+
+      - name: Comment on PR
+        uses: actions/github-script@v7
+
+        with:
+          retries: 3
+          script: |
+            const taskName = '${{ steps.extract_task_name.outputs.task_name }}';
+            const prNumber = context.payload.pull_request.number;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const comment = `The extracted task name from the branch is **${taskName}**.`;
+
+            github.rest.issues.createComment({
+              issue_number: prNumber,
+              owner,
+              repo,
+              body: comment
+            });
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - run: touch local.properties
+      - run: echo -e "\n$BUILD_CONFIG_VARIABLES" >> local.properties
+
+#      - name: Unit tests
+#        run: ./gradlew test
