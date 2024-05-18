@@ -3,14 +3,13 @@ on:
     branches: [ "main" ]
 
 jobs:
-  unit_tests:
+  comment_under_branch:
     runs-on: [ ubuntu-latest ]
-    permissions:
-      contents: write
+    permissions: write-all
     env:
       BUILD_CONFIG_VARIABLES: ${{ secrets.BUILD_CONFIG_VARIABLES }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -38,6 +37,7 @@ jobs:
 
         with:
           retries: 3
+          retry-exempt-status-codes: 400,401, 403
           script: |
             const taskName = '${{ steps.extract_task_name.outputs.task_name }}';
             const prNumber = context.payload.pull_request.number;
@@ -45,8 +45,8 @@ jobs:
             const repo = context.repo.repo;
             const comment = `The extracted task name from the branch is **${taskName}**.`;
 
-            github.rest.issues.createComment({
-              issue_number: prNumber,
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
               owner,
               repo,
               body: comment
@@ -57,6 +57,3 @@ jobs:
 
       - run: touch local.properties
       - run: echo -e "\n$BUILD_CONFIG_VARIABLES" >> local.properties
-
-#      - name: Unit tests
-#        run: ./gradlew test
